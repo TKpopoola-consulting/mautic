@@ -29,4 +29,7 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
-    publishLocation: 'Container'
+    publishLocation: 'Container' 
+
+- script: ls -la $(Build.SourcesDirectory)
+  displayName: 'List files in source directory'
