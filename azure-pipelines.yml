@@ -1,8 +1,3 @@
-# PHP
-# Test and package your PHP project.
-# Add steps that run tests, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/php
-
 trigger:
 - 6.x
 
@@ -13,6 +8,7 @@ variables:
   phpVersion: 8.1
 
 steps:
+# Set the PHP version
 - script: |
     sudo update-alternatives --set php /usr/bin/php$(phpVersion)
     sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
@@ -22,14 +18,28 @@ steps:
     php -version
   displayName: 'Use PHP version $(phpVersion)'
 
+# Install Composer dependencies
 - script: composer install --no-interaction --prefer-dist
   displayName: 'composer install'
 
+# List files in the source directory
+- script: ls -la $(Build.SourcesDirectory)
+  displayName: 'List files in source directory'
+
+# Copy files to the artifact staging directory
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**/*'  # Include all files and folders
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+# Debug: List files in artifact staging directory
+- script: ls -la $(Build.ArtifactStagingDirectory)
+  displayName: 'List files in artifact staging directory'
+
+# Publish the build artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
-    publishLocation: 'Container' 
-
-- script: ls -la $(Build.SourcesDirectory)
-  displayName: 'List files in source directory'
+    publishLocation: 'Container'
