@@ -1,20 +1,15 @@
-# Use a Node.js base image
-FROM node:14
+# Use a PHP or Node base image (depending on your application's requirements)
+FROM php:7.4-apache
 
-# Install any other dependencies you need here
+# Install necessary dependencies (example: curl)
 RUN apt-get update && apt-get install -y curl
 
-# Set the working directory
-WORKDIR /app
+# Copy your application files into the image
+COPY . /var/www/html/
 
-# Copy your app's source code into the container
-COPY . .
+# Expose necessary ports
+EXPOSE 80
 
-# Install app dependencies
-RUN npm install
+# Define the default command to run
+CMD ["apache2-foreground"]
 
-# Expose the necessary port for the app (e.g., for a web app, usually 8080)
-EXPOSE 8080
-
-# Run the application
-CMD ["npm", "start"]
