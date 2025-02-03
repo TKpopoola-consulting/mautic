@@ -1,19 +1,28 @@
-# Use a PHP base image with Apache
-FROM php:7.4-apache
+FROM node:14 AS build
 
-# Install necessary dependencies (example: curl)
-RUN apt-get update && apt-get install -y curl
+# Set the working directory
+WORKDIR /app
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Copy the package.json and install dependencies
+COPY package.json ./
+RUN npm install
 
-# Copy your application files into the image
-COPY . /var/www/html/
+# Copy the rest of the application code
+COPY . .
 
-# Expose necessary ports
+# Expose the port
+EXPOSE 8080
+
+# Create a new image for Apache
+FROM httpd:alpine
+
+# Install Node.js dependencies (from the build image)
+COPY --from=build /app /usr/local/apache2/htdocs/
+
+# Expose the default HTTP port
 EXPOSE 80
 
-# Define the default command to run
-CMD ["apache2-foreground"]
+CMD ["httpd", "-D", "FOREGROUND"]
+
 
 
